@@ -20,16 +20,16 @@ class apb_base_seq extends uvm_sequence#(apb_rw);
        // Create a write transaction
        rw_trans = apb_rw::type_id::create(.name("rw_trans"), .contxt(get_full_name()));
        start_item(rw_trans);
-       assert (rw_trans.randomize() with { pwrite == 1'b1; }); // Ensure it's a write transaction
+       assert(rw_trans.randomize() with { apb_cmd == apb_rw::WRITE; });
        finish_item(rw_trans);
        
        // Save the address used for the write transaction
-       bit [31:0] used_address = rw_trans.paddr;
+       bit [31:0] used_address = rw_trans.addr;
        
        // Create a read transaction to the same address
        rw_trans = apb_rw::type_id::create(.name("rw_trans"), .contxt(get_full_name()));
        start_item(rw_trans);
-       assert (rw_trans.randomize() with { pwrite == 1'b0; paddr == used_address; }); // Ensure it's a read transaction to the same address
+       assert(rw_trans.randomize() with { apb_cmd == apb_rw::READ; addr == used_address; });
        finish_item(rw_trans);
      end
   endtask
